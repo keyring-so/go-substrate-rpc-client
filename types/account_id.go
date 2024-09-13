@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
@@ -65,11 +66,13 @@ func (o *OptionAccountID) Unwrap() (ok bool, value AccountID) {
 }
 
 const (
-	AccountIDLen = 32
+	AccountIDLen   = 32
+	AccountIDLen33 = 33
 )
 
 // AccountID represents a public key (an 32 byte array)
 type AccountID [AccountIDLen]byte
+type AccountID33 [AccountIDLen33]byte
 
 func (a *AccountID) ToBytes() []byte {
 	if a == nil {
@@ -115,11 +118,25 @@ var (
 
 // NewAccountID creates a new AccountID type
 func NewAccountID(b []byte) (*AccountID, error) {
+	fmt.Println("lenght:", AccountIDLen)
 	if len(b) != AccountIDLen {
 		return nil, ErrInvalidAccountIDBytes
 	}
 
 	a := AccountID{}
+
+	copy(a[:], b)
+
+	return &a, nil
+}
+
+func NewAccountID33(b []byte) (*AccountID33, error) {
+	fmt.Println("lenght:", AccountIDLen33)
+	if len(b) != AccountIDLen33 {
+		return nil, ErrInvalidAccountIDBytes
+	}
+
+	a := AccountID33{}
 
 	copy(a[:], b)
 

@@ -24,6 +24,8 @@ import (
 type MultiAddress struct {
 	IsID        bool
 	AsID        AccountID
+	IsID33      bool
+	AsID33      AccountID33
 	IsIndex     bool
 	AsIndex     AccountIndex
 	IsRaw       bool
@@ -65,6 +67,12 @@ func (m MultiAddress) Encode(encoder scale.Encoder) error {
 		}
 
 		return encoder.Encode(m.AsID)
+	case m.IsID33:
+		if err = encoder.PushByte(0); err != nil {
+			return err
+		}
+
+		return encoder.Encode(m.AsID33)
 	case m.IsIndex:
 		if err = encoder.PushByte(1); err != nil {
 			return err
