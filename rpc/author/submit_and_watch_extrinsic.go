@@ -18,8 +18,9 @@ package author
 
 import (
 	"context"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 	"sync"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v4/gethrpc"
@@ -83,6 +84,21 @@ func (a *author) SubmitAndWatchDynamicExtrinsic(xt extrinsic.DynamicExtrinsic) (
 }
 
 func (a *author) submitAndWatchExtrinsic(hexEncodedExtrinsic string) (*ExtrinsicStatusSubscription, error) { //nolint:lll
+	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
+	defer cancel()
+
+	c := make(chan types.ExtrinsicStatus)
+
+	sub, err := a.client.Subscribe(ctx, "author", "submitAndWatchExtrinsic", "unwatchExtrinsic", "extrinsicUpdate",
+		c, hexEncodedExtrinsic)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ExtrinsicStatusSubscription{sub: sub, channel: c}, nil
+}
+
+func (a *author) SubmitAndWatchExtrinsicTest(hexEncodedExtrinsic string) (*ExtrinsicStatusSubscription, error) { //nolint:lll
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 

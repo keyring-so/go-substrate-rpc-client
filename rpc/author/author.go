@@ -27,6 +27,7 @@ import (
 type Author interface {
 	SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSubscription, error)
 	SubmitAndWatchDynamicExtrinsic(xt extrinsic.DynamicExtrinsic) (*ExtrinsicStatusSubscription, error)
+	SubmitAndWatchExtrinsicTest(hexEncodedExtrinsic string) (*ExtrinsicStatusSubscription, error)
 	PendingExtrinsics() ([]types.Extrinsic, error)
 	SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error)
 }

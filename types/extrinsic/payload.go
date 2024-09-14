@@ -214,7 +214,7 @@ var PayloadMutatorFns = map[extensions.SignedExtensionName]PayloadMutatorFn{
 // attempts to load and use a PayloadMutatorFn for each one.
 //
 // If a PayloadMutatorFn is not found for a specific signed extension, it means that it is not currently supported.
-func createPayload(meta *types.Metadata, encodedCall []byte) (*Payload, error) {
+func CreatePayload(meta *types.Metadata, encodedCall []byte) (*Payload, error) {
 	payload := &Payload{
 		EncodedCall: encodedCall,
 	}
