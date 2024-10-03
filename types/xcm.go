@@ -47,6 +47,36 @@ func (a AssetID) Encode(encoder scale.Encoder) error {
 	return nil
 }
 
+type AssetIDV4 struct {
+	Parents  U8
+	Interior JunctionsV3
+}
+
+func (a *AssetIDV4) Decode(decoder scale.Decoder) error {
+
+	if err := decoder.Decode(&a.Parents); err != nil {
+		return err
+	}
+
+	if err := decoder.Decode(&a.Interior); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a AssetIDV4) Encode(encoder scale.Encoder) error {
+	if err := encoder.Encode(a.Parents); err != nil {
+		return err
+	}
+
+	if err := encoder.Encode(a.Interior); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type AssetInstance struct {
 	IsUndefined bool
 
@@ -221,6 +251,28 @@ func (m MultiAssetV1) Encode(encoder scale.Encoder) error {
 }
 
 type MultiAssetsV1 []MultiAssetV1
+
+type MultiAssetsV4 []MultiAssetV4
+type MultiAssetV4 struct {
+	ID          AssetIDV4
+	Fungibility Fungibility
+}
+
+func (m *MultiAssetV4) Decode(decoder scale.Decoder) error {
+	if err := decoder.Decode(&m.ID); err != nil {
+		return err
+	}
+
+	return decoder.Decode(&m.Fungibility)
+}
+
+func (m MultiAssetV4) Encode(encoder scale.Encoder) error {
+	if err := encoder.Encode(m.ID); err != nil {
+		return err
+	}
+
+	return encoder.Encode(m.Fungibility)
+}
 
 type MultiAssetV0 struct {
 	IsNone bool
@@ -413,6 +465,9 @@ type VersionedMultiAssets struct {
 
 	IsV1          bool
 	MultiAssetsV1 MultiAssetsV1
+
+	IsV4          bool
+	MultiAssetsV4 MultiAssetsV4
 }
 
 func (v *VersionedMultiAssets) Decode(decoder scale.Decoder) error {
@@ -431,6 +486,9 @@ func (v *VersionedMultiAssets) Decode(decoder scale.Decoder) error {
 		v.IsV1 = true
 
 		return decoder.Decode(&v.MultiAssetsV1)
+	case 4:
+		v.IsV4 = true
+		return decoder.Decode(&v.MultiAssetsV4)
 	}
 
 	return nil
@@ -450,6 +508,11 @@ func (v VersionedMultiAssets) Encode(encoder scale.Encoder) error {
 		}
 
 		return encoder.Encode(v.MultiAssetsV1)
+	case v.IsV4:
+		if err := encoder.PushByte(4); err != nil {
+			return err
+		}
+		return encoder.Encode(v.MultiAssetsV4)
 	}
 
 	return nil

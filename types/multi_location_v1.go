@@ -83,6 +83,9 @@ type VersionedMultiLocation struct {
 
 	IsV1            bool
 	MultiLocationV1 MultiLocationV1
+
+	IsV4            bool
+	MultiLocationV4 MultiLocationV4
 }
 
 func (m *VersionedMultiLocation) Decode(decoder scale.Decoder) error {
@@ -100,6 +103,9 @@ func (m *VersionedMultiLocation) Decode(decoder scale.Decoder) error {
 		m.IsV1 = true
 
 		return decoder.Decode(&m.MultiLocationV1)
+	case 4:
+		m.IsV4 = true
+		return decoder.Decode(&m.MultiLocationV4)
 	}
 
 	return nil
@@ -119,6 +125,11 @@ func (m VersionedMultiLocation) Encode(encoder scale.Encoder) error {
 		}
 
 		return encoder.Encode(m.MultiLocationV1)
+	case m.IsV4:
+		if err := encoder.PushByte(4); err != nil {
+			return err
+		}
+		return encoder.Encode(m.MultiLocationV4)
 	}
 
 	return nil

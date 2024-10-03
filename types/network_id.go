@@ -69,3 +69,98 @@ func (n NetworkID) Encode(encoder scale.Encoder) error {
 
 	return nil
 }
+
+type OptionNetworkIDV3 struct {
+	option
+	value NetworkIDV3
+}
+
+func NewOptionNetworkIDV3Empty() OptionNetworkIDV3 {
+	return OptionNetworkIDV3{option: option{hasValue: false}}
+}
+
+func NewOptionNetworkIDV3(value NetworkIDV3) OptionNetworkIDV3 {
+	return OptionNetworkIDV3{option{hasValue: true}, value}
+}
+
+func (o *OptionNetworkIDV3) Decode(decoder scale.Decoder) error {
+	return decoder.DecodeOption(&o.hasValue, &o.value)
+}
+
+func (o OptionNetworkIDV3) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
+}
+
+type NetworkIDV3 struct {
+	IsByGenesis bool
+	ByGenesis   []U8
+
+	IsByForked bool
+	ByForked   []U8
+
+	IsPolkadot bool
+
+	IsKusama bool
+
+	IsWestend bool
+
+	IsRococo bool
+
+	IsWococo bool
+}
+
+func (n *NetworkIDV3) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+	if err != nil {
+		return err
+	}
+
+	switch b {
+	case 0:
+		n.IsByGenesis = true
+		return decoder.Decode(&n.ByGenesis)
+	case 1:
+		n.IsByForked = true
+		return decoder.Decode(&n.ByForked)
+	case 2:
+		n.IsPolkadot = true
+	case 3:
+		n.IsKusama = true
+	case 4:
+		n.IsWestend = true
+	case 5:
+		n.IsRococo = true
+	case 6:
+		n.IsWococo = true
+	}
+
+	return nil
+}
+
+func (n NetworkIDV3) Encode(encoder scale.Encoder) error {
+	switch {
+	case n.IsByGenesis:
+		if err := encoder.PushByte(0); err != nil {
+			return err
+		}
+		return encoder.Encode(n.ByGenesis)
+	case n.IsByForked:
+		if err := encoder.PushByte(1); err != nil {
+			return err
+		}
+
+		return encoder.Encode(n.ByForked)
+	case n.IsPolkadot:
+		return encoder.PushByte(2)
+	case n.IsKusama:
+		return encoder.PushByte(3)
+	case n.IsWestend:
+		return encoder.PushByte(4)
+	case n.IsRococo:
+		return encoder.PushByte(5)
+	case n.IsWococo:
+		return encoder.PushByte(6)
+	}
+
+	return nil
+}

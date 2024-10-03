@@ -276,6 +276,7 @@ func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
 		if err != nil {
 			return Call{}, err
 		}
+		fmt.Println("encode value", e)
 		a = append(a, e...)
 	}
 
