@@ -30,6 +30,7 @@ type Author interface {
 	SubmitAndWatchExtrinsicTest(hexEncodedExtrinsic string) (*ExtrinsicStatusSubscription, error)
 	PendingExtrinsics() ([]types.Extrinsic, error)
 	SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error)
+	SubmitDynamicExtrinsic(xt extrinsic.DynamicExtrinsic) (types.Hash, error)
 }
 
 // author exposes methods for authoring of network items

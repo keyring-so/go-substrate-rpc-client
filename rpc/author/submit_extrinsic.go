@@ -19,6 +19,7 @@ package author
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 )
 
 // SubmitExtrinsic will submit a fully formatted extrinsic for block inclusion
@@ -30,6 +31,21 @@ func (a *author) SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error) {
 
 	var res string
 	err = a.client.Call(&res, "author_submitExtrinsic", enc)
+	if err != nil {
+		return types.Hash{}, err
+	}
+
+	return types.NewHashFromHexString(res)
+}
+
+func (a *author) SubmitDynamicExtrinsic(xt extrinsic.DynamicExtrinsic) (types.Hash, error) { //nolint:lll
+	hexEncodedExtrinsic, err := codec.EncodeToHex(xt)
+	if err != nil {
+		return types.Hash{}, err
+	}
+
+	var res string
+	err = a.client.Call(&res, "author_submitExtrinsic", hexEncodedExtrinsic)
 	if err != nil {
 		return types.Hash{}, err
 	}
